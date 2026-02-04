@@ -33,8 +33,18 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true)
         {
             string filePath = dialog.FileName;
-            MessageBox.Show(filePath);
+            //MessageBox.Show(filePath); // Display the selected file path in the TextBox
             FilePathTextBox.Text = filePath;
+            SelectFileButton.IsEnabled = false;
+
+            CancelButton.Visibility = Visibility.Visible;
         }
+    }
+
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
+        FilePathTextBox.Text = string.Empty;
+        SelectFileButton.IsEnabled = true;
+        CancelButton.Visibility = Visibility.Collapsed;
     }
 }

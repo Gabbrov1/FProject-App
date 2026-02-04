@@ -23,21 +23,37 @@
                 Width="400"
                 Height="30"
                 IsReadOnly="True"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Border
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Background="LightGray"
+                    Padding="2"
+                    >
+                    <Button x:Name="SelectFileButton"
+                        Content="Select File"
+                        Width="120"
+                        Height="30"
+                        Click="SelectFile_Click"/>
+                </Border>
 
-            <Border
-                BorderBrush="Black"
-                BorderThickness="1"
-                CornerRadius="5"
-                Background="LightGray"
-                Padding="2"
-                >
-                <Button Content="Select File"
-                    Width="120"
-                    Height="30"
-                    Click="SelectFile_Click"/>
-            </Border>
-
-            
-        </StackPanel>
+                <Border
+                    x:Name="CancelButton"
+                    Visibility="Collapsed"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    CornerRadius="5"
+                    Background="LightGray"
+                    Padding="2"
+                    >
+                    <Button
+                        Content="Cancel"
+                        Width="120"
+                        Height="30"
+                        Click="CancelButton_Click"/>
+                </Border>
+            </StackPanel>
+        </StackPanel>        
     </Grid>
 </Window>
