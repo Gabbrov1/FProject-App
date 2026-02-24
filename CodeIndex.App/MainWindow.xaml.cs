@@ -1,14 +1,5 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
+﻿using System.Windows;
+
 
 namespace CodeIndex.App;
 
@@ -20,31 +11,15 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        var home = new homeControl();
+        home.fileSelected += swap2Snippet;
+
+        MainContent.Content = home;
     }
 
-    
-    private void SelectFile_Click(object sender, RoutedEventArgs e)
+    private void swap2Snippet(object sender, EventArgs e)
     {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "Code files (*.cs;*.py;*.js)|*.cs;*.py;*.js|All files (*.*)|*.*"
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            string filePath = dialog.FileName;
-            //MessageBox.Show(filePath); // Display the selected file path in the TextBox
-            FilePathTextBox.Text = filePath;
-            SelectFileButton.IsEnabled = false;
-
-            CancelButton.Visibility = Visibility.Visible;
-        }
-    }
-
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
-    {
-        FilePathTextBox.Text = string.Empty;
-        SelectFileButton.IsEnabled = true;
-        CancelButton.Visibility = Visibility.Collapsed;
+        MainContent.Content = new SnippetControl();
     }
 }

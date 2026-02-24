@@ -40,3 +40,8 @@ C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\CodeIndex.App.pdb
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\CodeIndex.App.genruntimeconfig.cache
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\ref\CodeIndex.App.dll
+c:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\Snippet.baml
+C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\Snippet.g.cs
+C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.baml
+C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.g.cs

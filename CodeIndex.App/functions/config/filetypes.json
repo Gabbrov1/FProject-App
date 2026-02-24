@@ -1,0 +1,14 @@
+{
+  "extensions": {
+    ".py": {
+      "language": "Python",
+      "keywords": ["def", "class", "import", "lambda"],
+      "commentSymbol": "#"
+    },
+    ".cs": {
+      "language": "C#",
+      "keywords": ["public", "class", "using", "namespace"],
+      "commentSymbol": "//"
+    }
+  }
+}
