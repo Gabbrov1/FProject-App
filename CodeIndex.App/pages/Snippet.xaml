@@ -1,0 +1,27 @@
+<UserControl x:Class="CodeIndex.App.SnippetControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10" Background="#F0F0F0">
+        <TextBlock Text="Snippet:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+        <ComboBox x:Name="SnippetCombo" Width="300" VerticalAlignment="Center"/>
+        <Button x:Name="LoadSnippetButton" Content="Load" Margin="10,0" Padding="15,5" Click="LoadSnippet_Click"/>
+    </StackPanel>
+    
+    <Border Grid.Row="1" BorderBrush="#CCCCCC" BorderThickness="1" Margin="10">
+        <ScrollViewer>
+        <TextBlock x:Name="CodeDisplay" 
+               Text="Select a snippet to display code..." 
+               TextWrapping="Wrap"
+               FontFamily="Consolas"
+               Margin="10"
+               Foreground="#333333"/>
+        </ScrollViewer>
+    </Border>
+    </Grid>
+</UserControl>
