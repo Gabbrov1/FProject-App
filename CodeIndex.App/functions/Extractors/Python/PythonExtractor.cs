@@ -21,7 +21,7 @@ namespace CodeIndex.App
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = false // Set to true for production.
             };
 
             using (var process = new Process { StartInfo = psi })
