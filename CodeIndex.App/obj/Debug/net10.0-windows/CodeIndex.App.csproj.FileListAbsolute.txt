@@ -45,3 +45,7 @@ C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\Snippet.g.cs
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.baml
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.g.cs
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.baml
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\Snippet.baml
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\home.g.cs
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\pages\Snippet.g.cs

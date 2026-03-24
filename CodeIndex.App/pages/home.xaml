@@ -9,7 +9,19 @@
                         FontSize="36"
                         FontWeight="Bold"
                         HorizontalAlignment="Center"
-                        Margin="0,20,0,10"/>
+                        Margin="0,20,0,10"
+                        Visibility="Collapsed"
+                        />
+            
+            <Image
+                Margin = "0,20,0,10"
+                Width  = "140"
+                Height = "60"
+                Source = "Images/logo.png"
+            >
+            
+            </Image>
+            
             <TextBlock Text="Your personal code snippet manager"
                         FontSize="16"
                         HorizontalAlignment="Center"/>
