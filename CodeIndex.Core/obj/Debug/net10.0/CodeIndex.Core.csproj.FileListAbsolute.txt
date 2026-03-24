@@ -1,0 +1,12 @@
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\bin\Debug\net10.0\CodeIndex.Core.deps.json
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\bin\Debug\net10.0\CodeIndex.Core.dll
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\bin\Debug\net10.0\CodeIndex.Core.pdb
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.AssemblyInfoInputs.cache
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.AssemblyInfo.cs
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.csproj.CoreCompileInputs.cache
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.sourcelink.json
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.dll
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\refint\CodeIndex.Core.dll
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\CodeIndex.Core.pdb
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Core\obj\Debug\net10.0\ref\CodeIndex.Core.dll

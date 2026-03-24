@@ -20,6 +20,7 @@ public partial class MainWindow : Window
 
     private void swap2Snippet(object sender, EventArgs e)
     {
-        MainContent.Content = new SnippetControl();
+        MainContent.Content = new SnippetControl(e);
+
     }
 }

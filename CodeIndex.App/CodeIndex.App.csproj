@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CodeIndex.Core\CodeIndex.Core.csproj" />
     <Resource Include="Images\logo.png" />
   </ItemGroup>
 </Project>

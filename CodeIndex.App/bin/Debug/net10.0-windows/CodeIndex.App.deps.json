@@ -7,14 +7,30 @@
   "targets": {
     ".NETCoreApp,Version=v10.0": {
       "CodeIndex.App/1.0.0": {
+        "dependencies": {
+          "CodeIndex.Core": "1.0.0"
+        },
         "runtime": {
           "CodeIndex.App.dll": {}
+        }
+      },
+      "CodeIndex.Core/1.0.0": {
+        "runtime": {
+          "CodeIndex.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
   },
   "libraries": {
     "CodeIndex.App/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CodeIndex.Core/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

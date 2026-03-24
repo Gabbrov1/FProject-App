@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using CodeIndex.Core;
 
 
 namespace CodeIndex.App
@@ -8,44 +9,53 @@ namespace CodeIndex.App
     public class pageLoader
     {
 
-        public async Task<string> loadPageAsync(string filePath)
+        public async Task<FileDetails>? loadPageAsync(string filePath)
         {
             if(!String.IsNullOrEmpty(filePath))
             {
                 Match match = Regex.Match(filePath, @"(\.[a-zA-Z0-9]+)$");// Get everything after the dot in the file Extension;
                 string extension = match.Groups[1].Value;
 
-                KeyValuePair<int, string> fileDetails;
+                FileDetails fileDetails;
 
 
                 switch (extension)
                 {
                     case ".py":
-                        await File.ReadAllTextAsync(filePath);
-                        break;
+                        // ASYNC read python file using custom reader
+                        return await PythonReader(filePath);
                     case ".cs":
-                        await File.ReadAllTextAsync(filePath);
-                        break;
+                        //ASYNC read c# file using custom reader
+                        return await PythonReader(filePath);//TODO: Implement C# reader
+                        
                     default:
-                        return "Unsupported file type.";
+                        throw new NotSupportedException($"File type {extension} is not supported.");
+                        return null;
                 }
-                string fileDetails = await getFileDetailsFromJsonAsync(extension);
-
             }
-            
-            return "";
+            return null;
         }
 
+        /// <summary>
+        /// Reads a Python file and extracts details about it.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>FileDetails </returns>
+        private async Task<FileDetails> PythonReader(string path)
+        {
+            FileDetails fileContent =  new FileDetails
+            {
+                Extension = ".py",
+                Language = "Python",
+                CommentSymbol = "#",
+                CodeSnippets = new Dictionary<int, string>
+                {
+                    { 1, $"def hello_world():\n    print(\"Hello, World! {path}\")" }
+                }
+            };
 
+            return fileContent;
+        }
     }
-    public class FileDetails
-    {
-        public required string Extension { get; set; }
-        public string? Language { get; set; }
-        public string? CommentSymbol { get; set; }
 
-        public Dictionary<int, string>? CodeSnippets { get; set; }
-
-
-    }
 }

@@ -3,11 +3,13 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 
+using CodeIndex.Core;
+
 namespace CodeIndex.App
 {
     public partial class homeControl: UserControl{
 
-        public event EventHandler fileSelected;
+        public event EventHandler<FileSelectedEventArgs> fileSelected;
 
         public homeControl(){
             InitializeComponent();
@@ -30,7 +32,7 @@ namespace CodeIndex.App
 
                 if (!String.IsNullOrEmpty(filePath))
                 {
-                    fileSelected?.Invoke(this, EventArgs.Empty);
+                    fileSelected?.Invoke(this, new FileSelectedEventArgs(filePath));
                 }
             }
 
