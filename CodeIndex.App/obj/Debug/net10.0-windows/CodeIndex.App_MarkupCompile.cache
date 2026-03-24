@@ -1,5 +1,5 @@
 ﻿CodeIndex.App
-1.0.0.0
+
 
 winexe
 C#
@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_O
 C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\App.xaml
 3-539515313
 
-9120615160
+7-588776458
 206-796764840
 MainWindow.xaml;pages\home.xaml;pages\Snippet.xaml;
 
-True
+False
 

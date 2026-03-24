@@ -19,10 +19,7 @@ namespace CodeIndex.App
         {
             snippets = new Dictionary<string, string>
             {
-                { "Hello World", "Console.WriteLine(\"Hello, World!\");" },
-                { "For Loop", "for (int i = 0; i < 10; i++)\n{\n    Console.WriteLine(i);\n}" },
-                { "If Statement", "if (condition)\n{\n    // Your code here\n}" },
-                { "Try Catch", "try\n{\n    // Your code here\n}\ncatch (Exception ex)\n{\n    Console.WriteLine(ex.Message);\n}" }
+                { "Hello World", "Console.WriteLine(\"Hello, World!\");" }
             };
 
             SnippetCombo.ItemsSource = snippets.Keys;
