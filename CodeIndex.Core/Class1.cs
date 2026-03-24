@@ -11,7 +11,14 @@
         }
     }
 
-
+    public class CodeSnippetClass
+    {
+        public string Name { get; set; }
+        public string Kind { get; set; }
+        public int Lineno { get; set; }
+        public int EndLineno { get; set; }
+        public string Source { get; set; }
+    }
     public class FileDetails
     {
         public required string Extension { get; set; }

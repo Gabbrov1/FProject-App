@@ -9,7 +9,7 @@ namespace CodeIndex.App
 {
     public partial class homeControl: UserControl{
 
-        public event EventHandler<FileSelectedEventArgs> fileSelected;
+        public event EventHandler<FileSelectedEventArgs>? fileSelected;
 
         public homeControl(){
             InitializeComponent();

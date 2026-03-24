@@ -8,7 +8,7 @@ namespace CodeIndex.App
 {
     public partial class SnippetControl : UserControl
     {
-        public string FilePath { get; set; }
+        public string? FilePath { get; set; }
 
         private Dictionary<int, string> snippets;
 
@@ -26,9 +26,14 @@ namespace CodeIndex.App
 
         private void InitializeSnippets()
         {
+            if (string.IsNullOrEmpty(FilePath))
+            {
+                MessageBox.Show("No file path provided.");
+                return;
+            }
 
             pageLoader loader = new pageLoader();
-            FileDetails fileDetails = loader.loadPageAsync(FilePath).Result;
+            FileDetails fileDetails = loader.loadPageAsync(FilePath)?.Result;
             snippets = fileDetails?.CodeSnippets ?? new Dictionary<int, string>();
 
 
@@ -37,7 +42,9 @@ namespace CodeIndex.App
 
         private void LoadSnippet_Click(object sender, RoutedEventArgs e)
         {
-            if (SnippetCombo.SelectedItem is int selectedKey && snippets.TryGetValue(selectedKey, out string code))
+            int key = (int)SnippetCombo.SelectedItem;
+            // Tries to get value for snippet key, if it exists display it in the TextBlock
+            if (snippets.TryGetValue(key, out string code))
             {
                 CodeDisplay.Text = code;
             }

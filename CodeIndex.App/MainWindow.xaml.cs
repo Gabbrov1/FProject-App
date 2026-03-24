@@ -11,16 +11,16 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
         var home = new homeControl();
         home.fileSelected += swap2Snippet;
-
         MainContent.Content = home;
     }
 
-    private void swap2Snippet(object sender, EventArgs e)
+    private void swap2Snippet(object? sender, EventArgs e)
     {
-        MainContent.Content = new SnippetControl(e);
-
+        if (e is not null)
+        {
+            MainContent.Content = new SnippetControl(e as CodeIndex.Core.FileSelectedEventArgs);
+        }
     }
 }
