@@ -43,4 +43,7 @@ if __name__ == "__main__":
     # argv[0] is the script name, [1] is your text
     input_file = sys.argv[1]
     result = extract_code_snippets(input_file)
-    print(json.dumps([asdict(s) for s in result]))  # dump as JSON
+    print (f"Extracted {len(result)} code snippets from {input_file}")
+    time.sleep(100)  # Sleep for a moment to ensure all output is printed before writing to file
+    with open('temp/output.json', 'w', encoding='utf-8') as f:
+        json.dump([asdict(s) for s in result], f, ensure_ascii=False, indent=4)  # dump as JSON to file

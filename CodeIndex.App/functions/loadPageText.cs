@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using CodeIndex.Core;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 
 namespace CodeIndex.App
@@ -40,16 +41,19 @@ namespace CodeIndex.App
         /// <returns>FileDetails </returns>
         private async Task<FileDetails> PythonReader(string path)
         {
+            
+            string extractorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "functions", "Extractors", "pythonExtractor.exe");
             var process = new Process
             {
+
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "python",
-                    Arguments = $"./Extractors/pythonExtractor.py \"{path}\"",
-                    RedirectStandardOutput = true,
+                    FileName = extractorPath,
+                    Arguments = $"\"{path}\"",
+                    RedirectStandardOutput = false,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                 }
             };
 
@@ -57,26 +61,29 @@ namespace CodeIndex.App
             process.Start();
             Debug.WriteLine("Process started.");
 
-            // Read both simultaneously using Task.WhenAll to prevent buffer deadlock
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            Debug.WriteLine("Waiting for output...");
-            await Task.WhenAll(stdoutTask, stderrTask);
-            Debug.WriteLine("Output received.");
+            var stderrTask = await process.StandardError.ReadToEndAsync();
 
             await process.WaitForExitAsync();
             Debug.WriteLine($"Process exited with code: {process.ExitCode}");
 
-            string json = stdoutTask.Result;
-            string error = stderrTask.Result;
+            string error = stderrTask;
 
-            Debug.WriteLine($"JSON: {json}");
             Debug.WriteLine($"Error: {error}");
 
             if (!string.IsNullOrEmpty(error))
                 throw new Exception($"Python error: {error}");
 
+
+            string json = await File.ReadAllTextAsync("output.json");
+            try
+            {
+                json = await File.ReadAllTextAsync("output.json");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error reading JSON file: {ex.Message}");
+                throw;
+            }
             var snippets = JsonSerializer.Deserialize<List<CodeSnippetClass>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true

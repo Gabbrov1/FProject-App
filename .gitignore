@@ -1,0 +1,25 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider
+.idea/
+
+# PyInstaller output
+dist/
+build/
+*.spec
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# dotnet
+*.nupkg
+*.snupkg

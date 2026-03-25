@@ -53,3 +53,5 @@ C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.Ap
 C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\bin\Debug\net10.0-windows\CodeIndex.Core.dll
 C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\bin\Debug\net10.0-windows\CodeIndex.Core.pdb
 C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\CodeInde.EBD7B0AD.Up2Date
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\bin\Debug\net10.0-windows\functions\Extractors\pythonExtractor.exe
+C:\Users\Gabriel Sorica\Desktop\Uni work\Final_Project\FProject-App\CodeIndex.App\obj\Debug\net10.0-windows\CodeIndex.App_Content.g.cs

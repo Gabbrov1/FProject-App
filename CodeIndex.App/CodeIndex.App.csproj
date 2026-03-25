@@ -10,6 +10,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeIndex.Core\CodeIndex.Core.csproj" />
+    
+    <Content Include="functions\Extractors\pythonExtractor.exe">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
     <Resource Include="Images\logo.png" />
   </ItemGroup>
 </Project>
