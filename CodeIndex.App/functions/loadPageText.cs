@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using CodeIndex.Core;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Windows;
+using System.Windows.Threading;
 
 
 namespace CodeIndex.App
@@ -22,10 +24,10 @@ namespace CodeIndex.App
                 {
                     case ".py":
                         // ASYNC read python file using custom reader
-                        return await PythonReader(filePath);
+                        return await PythonReaderAsync(filePath);
                     case ".cs":
                         //ASYNC read c# file using custom reader
-                        return await PythonReader(filePath);//TODO: Implement C# reader
+                        return await PythonReaderAsync(filePath);//TODO: Implement C# reader
                         
                     default:
                         throw new NotSupportedException($"File type {extension} is not supported.");
@@ -39,11 +41,17 @@ namespace CodeIndex.App
         /// </summary>
         /// <param name="path"></param>
         /// <returns>FileDetails </returns>
-        private async Task<FileDetails> PythonReader(string path)
+        private async Task<FileDetails> PythonReaderAsync(string path)
         {
             
             string extractorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "functions", "Extractors", "pythonExtractor.exe");
-            var process = new Process
+
+            bool createWindow = false; // Set to true to show the console window for debugging
+            #if DEBUG
+                createWindow = true;
+                #endif
+
+            using var process = new Process
             {
 
                 StartInfo = new ProcessStartInfo
@@ -53,49 +61,103 @@ namespace CodeIndex.App
                     RedirectStandardOutput = false,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = false,
+                    CreateNoWindow = createWindow,
                 }
             };
-
-            Debug.WriteLine("Starting process...");
+            Console.WriteLine("Starting process...");
             process.Start();
-            Debug.WriteLine("Process started.");
+            Console.WriteLine("Process started.");
 
-            var stderrTask = await process.StandardError.ReadToEndAsync();
+            string stderrTask = await process.StandardError.ReadToEndAsync();
 
-            await process.WaitForExitAsync();
-            Debug.WriteLine($"Process exited with code: {process.ExitCode}");
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60)); // 60 second timeout
+            try
+            {
+                await process.WaitForExitAsync(cts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                process.Kill();
+                throw new Exception("Python extractor timed out after 60 seconds.");
+            }
 
+            int exitCode = process.ExitCode;
+
+            // Check for errors
+            if (exitCode != 0)
+            {
+                HandlePythonError(exitCode, stderrTask);
+            }
+
+            // Log python error output for debugging
             string error = stderrTask;
 
             Debug.WriteLine($"Error: {error}");
 
             if (!string.IsNullOrEmpty(error))
-                throw new Exception($"Python error: {error}");
+            {
+                Debug.WriteLine($"Python extractor error: {error}");
+            }
 
-
-            string json = await File.ReadAllTextAsync("output.json");
+            string? json = null;
             try
             {
-                json = await File.ReadAllTextAsync("output.json");
+                json = await File.ReadAllTextAsync("./temp/output.json");
+            }
+            catch (FileNotFoundException)
+            {
+                Debug.WriteLine("JSON output file not found.");
+                throw;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error reading JSON file: {ex.Message}");
                 throw;
             }
-            var snippets = JsonSerializer.Deserialize<List<CodeSnippetClass>>(json, new JsonSerializerOptions
+            if (string.IsNullOrEmpty(json))
             {
-                PropertyNameCaseInsensitive = true
-            });
+                Debug.WriteLine("JSON output is empty.");
+                throw new Exception("JSON output is empty.");
+            }
+
+            List<CodeSnippetClass?> snippets = null;
+
+            
+            try
+            {
+                snippets = JsonSerializer.Deserialize<List<CodeSnippetClass>>
+                (json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                Debug.WriteLine("JSON output read successfully.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error logging JSON content: {ex.Message}");
+            }
+            
 
             return new FileDetails
             {
                 Extension = ".py",
                 Language = "Python",
                 CommentSymbol = "#",
-                CodeSnippets = snippets?.ToDictionary(s => s.Lineno, s => s.Source)
+                CodeSnippets = snippets?.ToDictionary(
+                    s => String.IsNullOrEmpty(s.Name) ?
+                        s.Lineno.ToString() : s.Name,
+                    s => s.Source)
             };
+        }
+
+        public void HandlePythonError(int exitCode, string errorMessage)
+        {
+            // The simple way to show an error
+            System.Windows.Application.Current.Dispatcher.Invoke(() => 
+            {
+                MessageBox.Show($"Python extractor failed with exit code {exitCode}.\nError message: {errorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            });
         }
     }
 

@@ -25,7 +25,7 @@
         public string? Language { get; set; }
         public string? CommentSymbol { get; set; }
 
-        public Dictionary<int, string>? CodeSnippets { get; set; }
+        public Dictionary<string, string>? CodeSnippets { get; set; }
 
 
     }

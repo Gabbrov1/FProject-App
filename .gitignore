@@ -1,6 +1,7 @@
 # Build output
 bin/
 obj/
+temp/
 
 # Visual Studio
 .vs/
