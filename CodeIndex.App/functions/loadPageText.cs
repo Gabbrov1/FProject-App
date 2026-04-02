@@ -49,7 +49,7 @@ namespace CodeIndex.App
             bool createWindow = false; // Set to true to show the console window for debugging
             #if DEBUG
                 createWindow = true;
-                #endif
+            #endif
 
             using var process = new Process
             {
@@ -87,6 +87,7 @@ namespace CodeIndex.App
             if (exitCode != 0)
             {
                 HandlePythonError(exitCode, stderrTask);
+                throw new Exception($"Python extractor failed with exit code {exitCode}.");
             }
 
             // Log python error output for debugging
@@ -120,7 +121,7 @@ namespace CodeIndex.App
                 throw new Exception("JSON output is empty.");
             }
 
-            List<CodeSnippetClass?> snippets = null;
+            List<CodeSnippetClass?>? snippets = null;
 
             
             try
@@ -144,10 +145,12 @@ namespace CodeIndex.App
                 Extension = ".py",
                 Language = "Python",
                 CommentSymbol = "#",
-                CodeSnippets = snippets?.ToDictionary(
-                    s => String.IsNullOrEmpty(s.Name) ?
-                        s.Lineno.ToString() : s.Name,
-                    s => s.Source)
+                CodeSnippets = snippets?
+                .Where(s => s is not null)          // filter out null items
+                .ToDictionary(
+                    s => String.IsNullOrEmpty(s!.Name) ?    // sets the key to Name if it exists
+                        s.Lineno.ToString() : s.Name,       // otherwise its set to line number
+                s => s!.Source)                             // sets the source as value
             };
         }
 
