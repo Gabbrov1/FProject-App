@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-
+using CodeIndex.Core;
 
 namespace CodeIndex.App;
 
@@ -11,16 +11,34 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        var home = new homeControl();
-        home.fileSelected += swap2Snippet;
-        MainContent.Content = home;
+        LoadHomeControl();
     }
 
-    private void swap2Snippet(object? sender, EventArgs e)
+    private void LoadHomeControl()
     {
-        if (e is not null)
+        MainContent.Content = new HomeControl();
+        if (MainContent.Content is HomeControl home)
         {
-            MainContent.Content = new SnippetControl(e as CodeIndex.Core.FileSelectedEventArgs);
+            home.fileSelected += OnFileSelected;
         }
+    }
+
+    private void OnFileSelected(object? sender, EventArgs e)
+    {
+        if (e is FileSelectedEventArgs fileArgs)
+        {
+            MainContent.Content = new SnippetControl(fileArgs);
+        }
+    }
+
+    private void UploadMenu_Click(object sender, RoutedEventArgs e)
+    {
+        
+        MainContent.Content = new UploadControl();
+    }
+
+    private void HomeMenu_Click(object sender, RoutedEventArgs e)
+    {
+        LoadHomeControl();
     }
 }

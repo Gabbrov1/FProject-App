@@ -7,11 +7,11 @@ using CodeIndex.Core;
 
 namespace CodeIndex.App
 {
-    public partial class homeControl: UserControl{
+    public partial class HomeControl: UserControl{
 
         public event EventHandler<FileSelectedEventArgs>? fileSelected;
 
-        public homeControl(){
+        public HomeControl(){
             InitializeComponent();
         }
         private void SelectFile_Click(object sender, RoutedEventArgs e)
@@ -35,8 +35,6 @@ namespace CodeIndex.App
                     fileSelected?.Invoke(this, new FileSelectedEventArgs(filePath));
                 }
             }
-
-            
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
