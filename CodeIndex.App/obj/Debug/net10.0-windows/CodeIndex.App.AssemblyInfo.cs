@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CodeIndex.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1517176583b858b0714d380c57c8d817625bbbe0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+95e9bece179ff8de508d5ab93a38585b7979fa6d")]
 [assembly: System.Reflection.AssemblyProductAttribute("CodeIndex.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CodeIndex.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

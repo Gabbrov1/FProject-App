@@ -69,6 +69,11 @@ namespace CodeIndex.App
                 CodeDisplay.Text = code;
         }
 
+        private void UploadSnippet_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Upload functionality is not implemented yet.");
+        }
+
         private async void RefreshSnippets_ClickAsync(object sender, RoutedEventArgs e)
         {
             try
