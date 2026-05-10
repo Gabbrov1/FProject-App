@@ -9,42 +9,67 @@ namespace CodeIndex.App
     public partial class SnippetControl : UserControl
     {
         public string? FilePath { get; set; }
-        private Dictionary<string?, string> snippets = new();
+        public object? ChosenSnippet { get; set; }
 
-        public SnippetControl(EventArgs eventArgs)
+        private Dictionary<string, string> snippets = new();
+
+        
+
+    /// <summary>
+        /// Constructor for SnippetControl that initializes the control with a file path
+        /// and loads snippets asynchronously.
+    /// </summary>
+    /// <param name="eventArgs">Event arguments that may contain file selection data</param>
+    public SnippetControl(EventArgs eventArgs)
+    {
+        if (eventArgs == null)
         {
-            if (eventArgs is FileSelectedEventArgs fileEventArgs)
-                FilePath = fileEventArgs.FilePath;
+            Console.WriteLine("No event arguments provided.");
+            return;
+        }    
+        // Check if the passed event args is a FileSelectedEventArgs (custom event type)
+        if (eventArgs is FileSelectedEventArgs fileEventArgs)
+            // Extract the file path from the event args and store it
+            FilePath = fileEventArgs.FilePath;
 
-            InitializeComponent();
+        // Initialize all XAML components defined in the designer
+        InitializeComponent();
 
-            _ = InitializeSnippetsAsync().ContinueWith(t =>
-            {
-                if (t.Exception != null)
-                    MessageBox.Show($"Load error: {t.Exception.InnerException?.Message}");
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
+        // Start the async task to load snippets from the file
+        // The _ discard operator means we don't need the Task return value
+        _ = InitializeSnippetsAsync().ContinueWith(t =>
+        {
+            // Check if the async task threw an exception during execution
+            if (t.Exception != null)
+                // Display an error message box to the user with the exception details
+                // InnerException gets the actual error (not the wrapper AggregateException)
+                MessageBox.Show($"Load error: {t.Exception.InnerException?.Message}");
+        }, 
+        // Execute the continuation on the UI thread to ensure MessageBox displays correctly
+        TaskScheduler.FromCurrentSynchronizationContext());
+    }
 
         private async Task InitializeSnippetsAsync()
         {
-            if (string.IsNullOrEmpty(FilePath))
+            if (FilePath is null or "")
             {
-                MessageBox.Show("No file path provided.");
+                Console.WriteLine("No file path provided.");
                 return;
             }
 
             try
             {
                 pageLoader loader = new pageLoader();
-                FileDetails? fileDetails = await loader.loadPageAsync(FilePath);
+                FileDetails fileDetails = await loader.loadPageAsync(FilePath);
 
-                if (fileDetails?.CodeSnippets != null && fileDetails.CodeSnippets.Count > 0)
+                
+                if (fileDetails?.CodeSnippets is not null && fileDetails.CodeSnippets.Count() > 0)
                 {
                     snippets = fileDetails.CodeSnippets;
                 }
                 else
                 {
-                    snippets = new Dictionary<string?, string>
+                    snippets = new Dictionary<string, string>
                     {
                         { "N/A", "No snippets found in this file." }
                     };
@@ -53,7 +78,7 @@ namespace CodeIndex.App
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to load snippets: {ex.Message}");
-                snippets = new Dictionary<string?, string>
+                snippets = new Dictionary<string, string>
                 {
                     { "Error", ex.Message }
                 };
@@ -61,13 +86,7 @@ namespace CodeIndex.App
 
             SnippetCombo.ItemsSource = snippets.Keys;
         }
-
-        private void LoadSnippet_Click(object sender, RoutedEventArgs e)
-        {
-            if (SnippetCombo.SelectedItem is not string key) return;
-            if (snippets.TryGetValue(key, out string? code))
-                CodeDisplay.Text = code;
-        }
+        
 
         private void UploadSnippet_Click(object sender, RoutedEventArgs e)
         {
@@ -84,6 +103,13 @@ namespace CodeIndex.App
             {
                 MessageBox.Show($"Refresh failed: {ex.Message}");
             }
+        }
+        
+        private void SnippetCombo_SelectionChanged(object sender,System.EventArgs e)
+        {
+            if (SnippetCombo.SelectedItem is not string key) return;
+            if (snippets.TryGetValue(key, out string? code))
+                CodeDisplay.Text = code;
         }
     }
 }

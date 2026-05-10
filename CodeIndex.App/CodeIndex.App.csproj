@@ -19,6 +19,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
-    <Resource Include="Images\logo.png" />
+    <Content Include="Assets\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    
   </ItemGroup>
 </Project>

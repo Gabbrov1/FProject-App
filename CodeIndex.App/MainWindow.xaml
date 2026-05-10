@@ -7,8 +7,26 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         
-        <Grid x:Name="Snippet">
+        <Grid.Style>
+            <StaticResource ResourceKey="MainGrid"/>
+        </Grid.Style>
+
+        <Grid Grid.Row="0" Style="{StaticResource MainGrid}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                <Button Content="Home" Style="{StaticResource NavButton}" Click="HomeMenu_Click"/>
+                <Button Content="Upload" Style="{StaticResource NavButton}" Click="UploadMenu_Click"/>
+                
+            </StackPanel>
+        </Grid>
+        
+
+        <Grid x:Name="Snippet" Grid.Row="1" Style="{StaticResource MainGrid}">
             <ContentControl x:Name="MainContent"/>
         </Grid>
     </Grid>

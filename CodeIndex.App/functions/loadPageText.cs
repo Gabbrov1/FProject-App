@@ -33,7 +33,7 @@ namespace CodeIndex.App
                         throw new NotSupportedException($"File type {extension} is not supported.");
                 }
             }
-            return null;
+            throw new InvalidDataException($"FilePath not set. FilePath: {filePath}");
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace CodeIndex.App
             
             try
             {
-                snippets = JsonSerializer.Deserialize<List<CodeSnippetClass>>
+                snippets = JsonSerializer.Deserialize<List<CodeSnippetClass?>>
                 (json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true

@@ -29,4 +29,11 @@
 
 
     }
+
+    public enum Pages
+    {
+        Home,
+        Snippet,
+        Upload
+    }
 }
