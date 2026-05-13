@@ -79,7 +79,7 @@ Code Extractor         Parses functions, signatures, docstrings, metadata
 
 ## 🔗 Related Repositories
 
-- [`FProject-Web`]([https://github.com/your-org/devdocs-hub-webapp](https://github.com/Gabbrov1/FProject-Web)) — Web App both frontend and backend
+ - [`FProject-Web`](https://github.com/Gabbrov1/FProject-Web) — Web App both frontend and backend
 
 ---
 
