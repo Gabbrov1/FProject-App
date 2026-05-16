@@ -9,7 +9,7 @@
             <CheckBox x:Name="SelectAllCheckBox" Content="Select All" Foreground="{StaticResource TextColor}" Margin="0,0,0,10" Checked="SelectAllCheckBox_Checked" Unchecked="SelectAllCheckBox_Unchecked"/>
             
             <Border Style="{StaticResource CardBorder}" Margin="0,0,0,15">
-                <ListBox x:Name="JsonFilesList" Height="300" Background="{StaticResource BackgroundColor}" BorderThickness="0" Foreground="{StaticResource TextColor}">
+                <ListBox x:Name="JsonFilesList" Height="100" Background="{StaticResource BackgroundColor}" BorderThickness="0" Foreground="{StaticResource TextColor}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <CheckBox Content="{Binding FileName}" IsChecked="{Binding IsSelected}" Click="FileCheckBox_Click" Foreground="{StaticResource TextColor}"/>
@@ -17,17 +17,20 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Border>
+            <StackPanel>
+
+                <TextBlock x:Name="StatusText" Text="Loading files..." Style="{StaticResource TextStyle}" Foreground="{StaticResource SecondaryTextColor}"/>
+                
+                <Button x:Name="UploadButton"
+                            Content="Upload"
+                            Width="120"
+                            Height="30"
+                            Style="{StaticResource ButtonStyle}"
+                            Click="UploadButton_Click"/>
+            </StackPanel>
             
-            <TextBlock x:Name="StatusText" Text="Loading files..." Style="{StaticResource TextStyle}" Foreground="{StaticResource SecondaryTextColor}"/>
         </StackPanel>
 
-        <StackPanel>
-            <Button x:Name="UploadButton"
-                        Content="Upload"
-                        Width="120"
-                        Height="30"
-                        Style="{StaticResource ButtonStyle}"
-                        Click="UploadButton_Click"/>
-        </StackPanel>
+        
     </Grid>
 </UserControl>

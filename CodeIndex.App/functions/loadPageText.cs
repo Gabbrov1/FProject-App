@@ -1,167 +1,104 @@
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using CodeIndex.Core;
 using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Windows;
-using System.Windows.Threading;
-
 
 namespace CodeIndex.App
 {
     public class pageLoader
     {
-
-        public async Task<FileDetails>? loadPageAsync(string filePath)
+        public async Task<FileDetails?> loadPageAsync(string filePath)
         {
-            if(!String.IsNullOrEmpty(filePath))
-            {
-                Match match = Regex.Match(filePath, @"(\.[a-zA-Z0-9]+)$");// Get everything after the dot in the file Extension;
-                string extension = match.Groups[1].Value;
+            if (string.IsNullOrEmpty(filePath))
+                throw new InvalidDataException($"FilePath not set. FilePath: {filePath}");
 
-                switch (extension)
-                {
-                    case ".py":
-                        // ASYNC read python file using custom reader
-                        return await PythonReaderAsync(filePath);
-                    case ".cs":
-                        //ASYNC read c# file using custom reader
-                        return await PythonReaderAsync(filePath);//TODO: Implement C# reader
-                        
-                    default:
-                        throw new NotSupportedException($"File type {extension} is not supported.");
-                }
-            }
-            throw new InvalidDataException($"FilePath not set. FilePath: {filePath}");
+            string extension = Regex.Match(filePath, @"(\.[a-zA-Z0-9]+)$").Groups[1].Value;
+
+            return extension switch
+            {
+                ".py" or ".cs" => await PythonReaderAsync(filePath, extension),
+                _ => throw new NotSupportedException($"File type {extension} is not supported.")
+            };
         }
 
-        /// <summary>
-        /// Reads a Python file and extracts details about it.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns>FileDetails </returns>
-        private async Task<FileDetails> PythonReaderAsync(string path)
+        private async Task<FileDetails> PythonReaderAsync(string path, string extension)
         {
-            
             string extractorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "functions", "Extractors", "pythonExtractor.exe");
-
-            bool createWindow = false; // Set to true to show the console window for debugging
-            #if DEBUG
-                createWindow = true;
-            #endif
 
             using var process = new Process
             {
-
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = extractorPath,
                     Arguments = $"\"{path}\"",
-                    RedirectStandardOutput = false,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = createWindow,
+                    #if DEBUG
+                        CreateNoWindow = true,
+                    #else
+                        CreateNoWindow = false,
+                    #endif
                 }
             };
-            Console.WriteLine("Starting process...");
+
             process.Start();
-            Console.WriteLine("Process started.");
+            string stderr = await process.StandardError.ReadToEndAsync();
 
-            string stderrTask = await process.StandardError.ReadToEndAsync();
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+            try { await process.WaitForExitAsync(cts.Token); }
+            catch (OperationCanceledException) { process.Kill(); throw new Exception("Python extractor timed out."); }
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60)); // 60 second timeout
-            try
+            if (process.ExitCode != 0)
             {
-                await process.WaitForExitAsync(cts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                process.Kill();
-                throw new Exception("Python extractor timed out after 60 seconds.");
+                HandlePythonError(process.ExitCode, stderr);
+                throw new Exception($"Python extractor failed with exit code {process.ExitCode}.");
             }
 
-            int exitCode = process.ExitCode;
+            if (!string.IsNullOrEmpty(stderr))
+                Debug.WriteLine($"Python extractor stderr: {stderr}");
 
-            // Check for errors
-            if (exitCode != 0)
-            {
-                HandlePythonError(exitCode, stderrTask);
-                throw new Exception($"Python extractor failed with exit code {exitCode}.");
-            }
-
-            // Log python error output for debugging
-            string error = stderrTask;
-
-            Debug.WriteLine($"Error: {error}");
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                Debug.WriteLine($"Python extractor error: {error}");
-            }
-
-            string? json = null;
-            try
-            {
-                json = await File.ReadAllTextAsync("./temp/output.json");
-            }
-            catch (FileNotFoundException)
-            {
-                Debug.WriteLine("JSON output file not found.");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error reading JSON file: {ex.Message}");
-                throw;
-            }
+            string json = await File.ReadAllTextAsync("./temp/output.json");
             if (string.IsNullOrEmpty(json))
-            {
-                Debug.WriteLine("JSON output is empty.");
                 throw new Exception("JSON output is empty.");
-            }
 
-            List<CodeSnippetClass?>? snippets = null;
+            var snippets = new List<CodeSnippetClass>();
 
-            
             try
             {
-                snippets = JsonSerializer.Deserialize<List<CodeSnippetClass?>>
-                (json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                Debug.WriteLine("JSON output read successfully.");
+                var root = JsonNode.Parse(json);
+                if (root is JsonObject obj)
+                    foreach (var fileEntry in obj)
+                        foreach (JsonNode? item in fileEntry.Value?["Content"]?.AsArray() ?? new JsonArray())
+                            if (item is not null)
+                            {
+                                var snippet = JsonSerializer.Deserialize<CodeSnippetClass>(item.ToJsonString(),
+                                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                                if (snippet is not null) snippets.Add(snippet);
+                            }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error logging JSON content: {ex.Message}");
+                Debug.WriteLine($"Error parsing JSON: {ex.Message}");
+                throw;
             }
-            
 
             return new FileDetails
             {
-                Extension = ".py",
-                Language = "Python",
-                CommentSymbol = "#",
-                CodeSnippets = snippets?
-                .Where(s => s is not null)          // filter out null items
-                .ToDictionary(
-                    s => String.IsNullOrEmpty(s!.Name) ?    // sets the key to Name if it exists
-                        s.Lineno.ToString() : s.Name,       // otherwise its set to line number
-                s => s!.Source)                             // sets the source as value
+                Extension = extension,
+                Language = extension == ".py" ? "Python" : "C#",
+                CommentSymbol = extension == ".py" ? "#" : "//",
+                CodeSnippets = snippets
             };
         }
 
         public void HandlePythonError(int exitCode, string errorMessage)
         {
-            // The simple way to show an error
-            System.Windows.Application.Current.Dispatcher.Invoke(() => 
-            {
-                MessageBox.Show($"Python extractor failed with exit code {exitCode}.\nError message: {errorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            });
+            Application.Current.Dispatcher.Invoke(() =>
+                MessageBox.Show($"Python extractor failed with exit code {exitCode}.\nError: {errorMessage}",
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error));
         }
     }
-
 }

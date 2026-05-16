@@ -75,7 +75,7 @@ namespace CodeIndex.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/CodeIndex.App;V1.0.0.0;component/pages/home.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CodeIndex.App;component/pages/home.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\pages\home.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

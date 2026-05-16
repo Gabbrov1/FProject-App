@@ -1,93 +1,201 @@
-[
+
+{
+  "files": [
     {
-        "name": "health_check",
-        "kind": "function",
-        "lineno": 60,
-        "end_lineno": 61,
-        "source": "def health_check():\n    return jsonify({\"status\": \"OK\"}), 200"
+    "file1.json":{
+        "lang":"python",
+        "Content":
+        [
+            {
+                "name": "health_check",
+                "kind": "function",
+                "lineno": 60,
+                "end_lineno": 61,
+                "source": "def health_check():\n    return jsonify({\"status\": \"OK\"}), 200"
+            },
+            {
+                "name": "games",
+                "kind": "function",
+                "lineno": 65,
+                "end_lineno": 86,
+                "source": "def games():\n    pageNr = request.args.get('pageNr', default=0, type=int)\n    rows = request.args.get('rows', default=10, type=int)\n    \n    if pageNr < 0:\n        pageNr = 0\n    if rows < 1:\n        rows = 1\n    \n    conn = db.create_connection()\n    with conn.cursor() as cursor:  \n        cursor.execute(\"SELECT COUNT(*) as Total FROM Games;\")\n        total_items = cursor.fetchone()[\"Total\"]\n    conn.close()\n        \n    games_list = db.getGamesByPage(pageNr,rows)\n    total_pages = math.ceil(total_items / rows) if rows > 0 else 1\n    \n    return jsonify({\n        \"total_pages\": total_pages,\n        \"data\": games_list\n        })"
+            },
+            {
+                "name": "game",
+                "kind": "function",
+                "lineno": 89,
+                "end_lineno": 158,
+                "source": "def game(id):\n    #TODO: Move function to Database.py and call it here\n    sql = \"\"\"\n        SELECT\n        g.ID,\n        g.GameName as Title,\n        g.GameDescription AS Description,\n\n        GA.ArticleBody,\n        GA.CommentsLink,\n\n        (\n            SELECT STRING_AGG(c.name, ', ')\n            FROM Categories c\n            JOIN GamesCategories gc ON gc.CategoryID = c.ID\n            WHERE gc.GameID = g.ID\n        ) AS Categories,\n        (\n            SELECT STRING_AGG(con.name, ', ')\n            FROM Consoles con\n            JOIN GamesConsoles gcon ON gcon.ConsoleID = con.ID\n            WHERE gcon.GameID = g.ID\n        ) AS Consoles,\n        \n        (\n            SELECT STRING_AGG(AI.ImageURL, ', ')\n            FROM ArticleImages AI\n            JOIN GamesArticles GA ON GA.ID = AI.ArticleID\n            WHERE GA.GameID = g.ID\n        ) AS ImageURLs\n\n        FROM Games g\n        OUTER APPLY (\n            SELECT TOP (1)\n                ga.ID,\n                ga.ArticleBody,\n                ga.CommentsLink\n            FROM GamesArticles ga\n            WHERE ga.GameID = g.ID\n            ORDER BY ga.ID\n        ) AS GA\n        WHERE g.ID = %s;\n\n    \"\"\"\n    conn = db.create_connection()\n    cursor = conn.cursor()\n    cursor.execute(sql, (id,))\n\n    row = cursor.fetchone()\n    if row:\n        game = {\n            \"ID\": row[\"ID\"],\n            \"Title\": row[\"Title\"],\n            \"Description\": row[\"Description\"],\n            \"ArticleBody\": row[\"ArticleBody\"],\n\n            \"CommentsLink\": row[\"CommentsLink\"],\n            \"Categories\": row[\"Categories\"],\n            \"Consoles\": row[\"Consoles\"],\n\n            \"ImageURLs\": row[\"ImageURLs\"].split(', ') if row[\"ImageURLs\"] else []\n        }\n    \n    else:\n        \n        return jsonify({\"error\": \"Game not found\"}), 404\n    \n    conn.close()\n\n    return jsonify(game),200"
+            },
+            {
+                "name": "log_in",
+                "kind": "function",
+                "lineno": 163,
+                "end_lineno": 184,
+                "source": "def log_in():\n    username = request.form.get('username')\n    password = request.form.get('password')\n\n    if not username or not password:\n        return jsonify({\"error\": \"Missing username or password\"}), 400\n\n    user = auth.checkDetails(username, password)\n\n    if not user:\n        # Invalid username or password\n        return jsonify({\"error\": \"Invalid username or password\"}), 401\n    \n    # Store in session\n    session['user_id'] = user.get(\"MongoId\")\n    session['username'] = user.get(\"Username\")\n    session['is_admin'] = user.get(\"isAdmin\", False)\n\n    # Successful login\n    \n    print(f\"{session.get('username')}({session.get('user_id')}) logged in.\")\n    return jsonify({\"message\": \"Login successful\", \"user\": user}), 200"
+            },
+            {
+                "name": "newAccount",
+                "kind": "function",
+                "lineno": 187,
+                "end_lineno": 196,
+                "source": "def newAccount():    \n    username = request.form.get('username')\n    passwordHash = request.form.get('password')\n    \n    response = auth.createAccount(username,passwordHash)\n    \n    if response[0]==True:\n        return redirect(url_for('log_in'), code=307)  # Use 307 to preserve the POST method\n    else:\n        return jsonify({\"message\": \"Error\", \"username\": response})"
+            },
+            {
+                "name": "delete_account",
+                "kind": "function",
+                "lineno": 199,
+                "end_lineno": 207,
+                "source": "def delete_account():\n    if 'user_id' in session:\n        user_id = session['user_id']\n        auth.deleteAccount(user_id)\n        db.deleteUser(user_id)\n        session.pop(\"user_id\", None)\n        return jsonify({\"message\": \"Account deleted successfully\"}), 200\n    else:\n        return jsonify({\"error\": \"Not authenticated\"}), 401"
+            },
+            {
+                "name": "log_out",
+                "kind": "function",
+                "lineno": 210,
+                "end_lineno": 212,
+                "source": "def log_out():\n    session.pop(\"user_id\", None)\n    return redirect('/')"
+            },
+            {
+                "name": "auth_status",
+                "kind": "function",
+                "lineno": 215,
+                "end_lineno": 227,
+                "source": "def auth_status():\n    if 'user_id' in session:\n        session[\"logged_in\"]=True\n        return jsonify({\n            \"logged_in\": True,\n            \"user\": {\n                \"ID\": session['user_id'],\n                \"Username\": session['username'],\n                \"isAdmin\": session.get('is_admin')\n            }\n        }), 200\n    else:\n        return jsonify({\"logged_in\": False}), 200"
+            },
+            {
+                "name": "google_login",
+                "kind": "function",
+                "lineno": 230,
+                "end_lineno": 232,
+                "source": "def google_login():\n    redirect_uri = url_for(\"google_authorize\", _external=True)\n    return google.authorize_redirect(redirect_uri)"
+            },
+            {
+                "name": "google_authorize",
+                "kind": "function",
+                "lineno": 235,
+                "end_lineno": 258,
+                "source": "def google_authorize():\n    token = google.authorize_access_token()\n    user_info = token[\"userinfo\"]\n\n    \n    googleLogin = auth.googleLogin(\n        user_info[\"sub\"],\n        user_info[\"email\"]\n    )\n    if googleLogin is None:\n        return jsonify({\"error\": \"Google login failed\"}), 401\n    \n    \n    \n    session[\"user\"] = {\n        \"id\": googleLogin.get(\"MongoId\"),\n        \"email\": user_info.get(\"email\"),\n        \"name\": user_info.get(\"name\"),\n        \"picture\": user_info.get(\"picture\"),\n        \"username\": googleLogin.get(\"Username\")\n    }\n    session[\"logged_in\"]=True\n    \n    return redirect(\"https://sd-bu25.pages.dev/auth/Account\")"
+            },
+            {
+                "name": "comments",
+                "kind": "function",
+                "lineno": 262,
+                "end_lineno": 299,
+                "source": "def comments(gameID):\n    # Only changing this function to use single return statement due to confusion with multiple return statements and status codes.\n    # Other functions can be changed later if needed. Priority Low.\n    status={}\n    code=0\n    \n    if request.method == 'POST':\n        if session.get(\"user_id\") is None:\n            status[\"error\"]=\"Authentication required\"\n            code=401\n            return jsonify(status),code \n        \n         \n        commentData = {\n            \"gameID\": gameID,\n            \"userID\": db.to_objId(session.get(\"user_id\")),\n            \"parentCommentID\": db.to_objId(request.json.get(\"parentCommentID\")),\n            \"commentText\": request.json.get(\"commentText\"),\n            \"createdAt\": request.json.get(\"createdAt\")\n        }\n        db.addComment(commentData)\n        status[\"message\"]=\"Comment added successfully\"\n        code=201\n\n    elif request.method == 'GET':  # GET request\n            \n        comments = db.getComments(gameID)\n        if comments is None or len(comments) == 0:\n            status[\"error\"]=\"No comments found\"\n            code=404\n        status={\"comments\":comments}\n        code=200\n    else:\n        status[\"error\"]=\"Invalid request method\"\n        code=405\n    \n    # New method of returning response with status code. Changed due to confusion with multiple return statements.\n    return jsonify(status),code"
+            },
+            {
+                "name": "get_users",
+                "kind": "function",
+                "lineno": 302,
+                "end_lineno": 304,
+                "source": "def get_users():\n    users = db.getAllUsers()\n    return jsonify({\"users\": users}), 200"
+            },
+            {
+                "name": "get_user",
+                "kind": "function",
+                "lineno": 307,
+                "end_lineno": 311,
+                "source": "def get_user(userId):\n    user = db.getUser(userId)\n    if not user:\n        return jsonify({\"error\": \"User not found\"}), 404\n    return jsonify(user), 200"
+            }
+        ]
     },
-    {
-        "name": "games",
-        "kind": "function",
-        "lineno": 65,
-        "end_lineno": 86,
-        "source": "def games():\n    pageNr = request.args.get('pageNr', default=0, type=int)\n    rows = request.args.get('rows', default=10, type=int)\n    \n    if pageNr < 0:\n        pageNr = 0\n    if rows < 1:\n        rows = 1\n    \n    conn = db.create_connection()\n    with conn.cursor() as cursor:  \n        cursor.execute(\"SELECT COUNT(*) as Total FROM Games;\")\n        total_items = cursor.fetchone()[\"Total\"]\n    conn.close()\n        \n    games_list = db.getGamesByPage(pageNr,rows)\n    total_pages = math.ceil(total_items / rows) if rows > 0 else 1\n    \n    return jsonify({\n        \"total_pages\": total_pages,\n        \"data\": games_list\n        })"
-    },
-    {
-        "name": "game",
-        "kind": "function",
-        "lineno": 89,
-        "end_lineno": 158,
-        "source": "def game(id):\n    #TODO: Move function to Database.py and call it here\n    sql = \"\"\"\n        SELECT\n        g.ID,\n        g.GameName as Title,\n        g.GameDescription AS Description,\n\n        GA.ArticleBody,\n        GA.CommentsLink,\n\n        (\n            SELECT STRING_AGG(c.name, ', ')\n            FROM Categories c\n            JOIN GamesCategories gc ON gc.CategoryID = c.ID\n            WHERE gc.GameID = g.ID\n        ) AS Categories,\n        (\n            SELECT STRING_AGG(con.name, ', ')\n            FROM Consoles con\n            JOIN GamesConsoles gcon ON gcon.ConsoleID = con.ID\n            WHERE gcon.GameID = g.ID\n        ) AS Consoles,\n        \n        (\n            SELECT STRING_AGG(AI.ImageURL, ', ')\n            FROM ArticleImages AI\n            JOIN GamesArticles GA ON GA.ID = AI.ArticleID\n            WHERE GA.GameID = g.ID\n        ) AS ImageURLs\n\n        FROM Games g\n        OUTER APPLY (\n            SELECT TOP (1)\n                ga.ID,\n                ga.ArticleBody,\n                ga.CommentsLink\n            FROM GamesArticles ga\n            WHERE ga.GameID = g.ID\n            ORDER BY ga.ID\n        ) AS GA\n        WHERE g.ID = %s;\n\n    \"\"\"\n    conn = db.create_connection()\n    cursor = conn.cursor()\n    cursor.execute(sql, (id,))\n\n    row = cursor.fetchone()\n    if row:\n        game = {\n            \"ID\": row[\"ID\"],\n            \"Title\": row[\"Title\"],\n            \"Description\": row[\"Description\"],\n            \"ArticleBody\": row[\"ArticleBody\"],\n\n            \"CommentsLink\": row[\"CommentsLink\"],\n            \"Categories\": row[\"Categories\"],\n            \"Consoles\": row[\"Consoles\"],\n\n            \"ImageURLs\": row[\"ImageURLs\"].split(', ') if row[\"ImageURLs\"] else []\n        }\n    \n    else:\n        \n        return jsonify({\"error\": \"Game not found\"}), 404\n    \n    conn.close()\n\n    return jsonify(game),200"
-    },
-    {
-        "name": "log_in",
-        "kind": "function",
-        "lineno": 163,
-        "end_lineno": 184,
-        "source": "def log_in():\n    username = request.form.get('username')\n    password = request.form.get('password')\n\n    if not username or not password:\n        return jsonify({\"error\": \"Missing username or password\"}), 400\n\n    user = auth.checkDetails(username, password)\n\n    if not user:\n        # Invalid username or password\n        return jsonify({\"error\": \"Invalid username or password\"}), 401\n    \n    # Store in session\n    session['user_id'] = user.get(\"MongoId\")\n    session['username'] = user.get(\"Username\")\n    session['is_admin'] = user.get(\"isAdmin\", False)\n\n    # Successful login\n    \n    print(f\"{session.get('username')}({session.get('user_id')}) logged in.\")\n    return jsonify({\"message\": \"Login successful\", \"user\": user}), 200"
-    },
-    {
-        "name": "newAccount",
-        "kind": "function",
-        "lineno": 187,
-        "end_lineno": 196,
-        "source": "def newAccount():    \n    username = request.form.get('username')\n    passwordHash = request.form.get('password')\n    \n    response = auth.createAccount(username,passwordHash)\n    \n    if response[0]==True:\n        return redirect(url_for('log_in'), code=307)  # Use 307 to preserve the POST method\n    else:\n        return jsonify({\"message\": \"Error\", \"username\": response})"
-    },
-    {
-        "name": "delete_account",
-        "kind": "function",
-        "lineno": 199,
-        "end_lineno": 207,
-        "source": "def delete_account():\n    if 'user_id' in session:\n        user_id = session['user_id']\n        auth.deleteAccount(user_id)\n        db.deleteUser(user_id)\n        session.pop(\"user_id\", None)\n        return jsonify({\"message\": \"Account deleted successfully\"}), 200\n    else:\n        return jsonify({\"error\": \"Not authenticated\"}), 401"
-    },
-    {
-        "name": "log_out",
-        "kind": "function",
-        "lineno": 210,
-        "end_lineno": 212,
-        "source": "def log_out():\n    session.pop(\"user_id\", None)\n    return redirect('/')"
-    },
-    {
-        "name": "auth_status",
-        "kind": "function",
-        "lineno": 215,
-        "end_lineno": 227,
-        "source": "def auth_status():\n    if 'user_id' in session:\n        session[\"logged_in\"]=True\n        return jsonify({\n            \"logged_in\": True,\n            \"user\": {\n                \"ID\": session['user_id'],\n                \"Username\": session['username'],\n                \"isAdmin\": session.get('is_admin')\n            }\n        }), 200\n    else:\n        return jsonify({\"logged_in\": False}), 200"
-    },
-    {
-        "name": "google_login",
-        "kind": "function",
-        "lineno": 230,
-        "end_lineno": 232,
-        "source": "def google_login():\n    redirect_uri = url_for(\"google_authorize\", _external=True)\n    return google.authorize_redirect(redirect_uri)"
-    },
-    {
-        "name": "google_authorize",
-        "kind": "function",
-        "lineno": 235,
-        "end_lineno": 258,
-        "source": "def google_authorize():\n    token = google.authorize_access_token()\n    user_info = token[\"userinfo\"]\n\n    \n    googleLogin = auth.googleLogin(\n        user_info[\"sub\"],\n        user_info[\"email\"]\n    )\n    if googleLogin is None:\n        return jsonify({\"error\": \"Google login failed\"}), 401\n    \n    \n    \n    session[\"user\"] = {\n        \"id\": googleLogin.get(\"MongoId\"),\n        \"email\": user_info.get(\"email\"),\n        \"name\": user_info.get(\"name\"),\n        \"picture\": user_info.get(\"picture\"),\n        \"username\": googleLogin.get(\"Username\")\n    }\n    session[\"logged_in\"]=True\n    \n    return redirect(\"https://sd-bu25.pages.dev/auth/Account\")"
-    },
-    {
-        "name": "comments",
-        "kind": "function",
-        "lineno": 262,
-        "end_lineno": 299,
-        "source": "def comments(gameID):\n    # Only changing this function to use single return statement due to confusion with multiple return statements and status codes.\n    # Other functions can be changed later if needed. Priority Low.\n    status={}\n    code=0\n    \n    if request.method == 'POST':\n        if session.get(\"user_id\") is None:\n            status[\"error\"]=\"Authentication required\"\n            code=401\n            return jsonify(status),code \n        \n         \n        commentData = {\n            \"gameID\": gameID,\n            \"userID\": db.to_objId(session.get(\"user_id\")),\n            \"parentCommentID\": db.to_objId(request.json.get(\"parentCommentID\")),\n            \"commentText\": request.json.get(\"commentText\"),\n            \"createdAt\": request.json.get(\"createdAt\")\n        }\n        db.addComment(commentData)\n        status[\"message\"]=\"Comment added successfully\"\n        code=201\n\n    elif request.method == 'GET':  # GET request\n            \n        comments = db.getComments(gameID)\n        if comments is None or len(comments) == 0:\n            status[\"error\"]=\"No comments found\"\n            code=404\n        status={\"comments\":comments}\n        code=200\n    else:\n        status[\"error\"]=\"Invalid request method\"\n        code=405\n    \n    # New method of returning response with status code. Changed due to confusion with multiple return statements.\n    return jsonify(status),code"
-    },
-    {
-        "name": "get_users",
-        "kind": "function",
-        "lineno": 302,
-        "end_lineno": 304,
-        "source": "def get_users():\n    users = db.getAllUsers()\n    return jsonify({\"users\": users}), 200"
-    },
-    {
-        "name": "get_user",
-        "kind": "function",
-        "lineno": 307,
-        "end_lineno": 311,
-        "source": "def get_user(userId):\n    user = db.getUser(userId)\n    if not user:\n        return jsonify({\"error\": \"User not found\"}), 404\n    return jsonify(user), 200"
+    "file2.json":{
+        "lang":"python",
+        "Content":
+        [
+            {
+                "name": "health_check",
+                "kind": "function",
+                "lineno": 60,
+                "end_lineno": 61,
+                "source": "def health_check():\n    return jsonify({\"status\": \"OK\"}), 200"
+            },
+            {
+                "name": "games",
+                "kind": "function",
+                "lineno": 65,
+                "end_lineno": 86,
+                "source": "def games():\n    pageNr = request.args.get('pageNr', default=0, type=int)\n    rows = request.args.get('rows', default=10, type=int)\n    \n    if pageNr < 0:\n        pageNr = 0\n    if rows < 1:\n        rows = 1\n    \n    conn = db.create_connection()\n    with conn.cursor() as cursor:  \n        cursor.execute(\"SELECT COUNT(*) as Total FROM Games;\")\n        total_items = cursor.fetchone()[\"Total\"]\n    conn.close()\n        \n    games_list = db.getGamesByPage(pageNr,rows)\n    total_pages = math.ceil(total_items / rows) if rows > 0 else 1\n    \n    return jsonify({\n        \"total_pages\": total_pages,\n        \"data\": games_list\n        })"
+            },
+            {
+                "name": "game",
+                "kind": "function",
+                "lineno": 89,
+                "end_lineno": 158,
+                "source": "def game(id):\n    #TODO: Move function to Database.py and call it here\n    sql = \"\"\"\n        SELECT\n        g.ID,\n        g.GameName as Title,\n        g.GameDescription AS Description,\n\n        GA.ArticleBody,\n        GA.CommentsLink,\n\n        (\n            SELECT STRING_AGG(c.name, ', ')\n            FROM Categories c\n            JOIN GamesCategories gc ON gc.CategoryID = c.ID\n            WHERE gc.GameID = g.ID\n        ) AS Categories,\n        (\n            SELECT STRING_AGG(con.name, ', ')\n            FROM Consoles con\n            JOIN GamesConsoles gcon ON gcon.ConsoleID = con.ID\n            WHERE gcon.GameID = g.ID\n        ) AS Consoles,\n        \n        (\n            SELECT STRING_AGG(AI.ImageURL, ', ')\n            FROM ArticleImages AI\n            JOIN GamesArticles GA ON GA.ID = AI.ArticleID\n            WHERE GA.GameID = g.ID\n        ) AS ImageURLs\n\n        FROM Games g\n        OUTER APPLY (\n            SELECT TOP (1)\n                ga.ID,\n                ga.ArticleBody,\n                ga.CommentsLink\n            FROM GamesArticles ga\n            WHERE ga.GameID = g.ID\n            ORDER BY ga.ID\n        ) AS GA\n        WHERE g.ID = %s;\n\n    \"\"\"\n    conn = db.create_connection()\n    cursor = conn.cursor()\n    cursor.execute(sql, (id,))\n\n    row = cursor.fetchone()\n    if row:\n        game = {\n            \"ID\": row[\"ID\"],\n            \"Title\": row[\"Title\"],\n            \"Description\": row[\"Description\"],\n            \"ArticleBody\": row[\"ArticleBody\"],\n\n            \"CommentsLink\": row[\"CommentsLink\"],\n            \"Categories\": row[\"Categories\"],\n            \"Consoles\": row[\"Consoles\"],\n\n            \"ImageURLs\": row[\"ImageURLs\"].split(', ') if row[\"ImageURLs\"] else []\n        }\n    \n    else:\n        \n        return jsonify({\"error\": \"Game not found\"}), 404\n    \n    conn.close()\n\n    return jsonify(game),200"
+            },
+            {
+                "name": "log_in",
+                "kind": "function",
+                "lineno": 163,
+                "end_lineno": 184,
+                "source": "def log_in():\n    username = request.form.get('username')\n    password = request.form.get('password')\n\n    if not username or not password:\n        return jsonify({\"error\": \"Missing username or password\"}), 400\n\n    user = auth.checkDetails(username, password)\n\n    if not user:\n        # Invalid username or password\n        return jsonify({\"error\": \"Invalid username or password\"}), 401\n    \n    # Store in session\n    session['user_id'] = user.get(\"MongoId\")\n    session['username'] = user.get(\"Username\")\n    session['is_admin'] = user.get(\"isAdmin\", False)\n\n    # Successful login\n    \n    print(f\"{session.get('username')}({session.get('user_id')}) logged in.\")\n    return jsonify({\"message\": \"Login successful\", \"user\": user}), 200"
+            },
+            {
+                "name": "newAccount",
+                "kind": "function",
+                "lineno": 187,
+                "end_lineno": 196,
+                "source": "def newAccount():    \n    username = request.form.get('username')\n    passwordHash = request.form.get('password')\n    \n    response = auth.createAccount(username,passwordHash)\n    \n    if response[0]==True:\n        return redirect(url_for('log_in'), code=307)  # Use 307 to preserve the POST method\n    else:\n        return jsonify({\"message\": \"Error\", \"username\": response})"
+            },
+            {
+                "name": "delete_account",
+                "kind": "function",
+                "lineno": 199,
+                "end_lineno": 207,
+                "source": "def delete_account():\n    if 'user_id' in session:\n        user_id = session['user_id']\n        auth.deleteAccount(user_id)\n        db.deleteUser(user_id)\n        session.pop(\"user_id\", None)\n        return jsonify({\"message\": \"Account deleted successfully\"}), 200\n    else:\n        return jsonify({\"error\": \"Not authenticated\"}), 401"
+            },
+            {
+                "name": "log_out",
+                "kind": "function",
+                "lineno": 210,
+                "end_lineno": 212,
+                "source": "def log_out():\n    session.pop(\"user_id\", None)\n    return redirect('/')"
+            },
+            {
+                "name": "auth_status",
+                "kind": "function",
+                "lineno": 215,
+                "end_lineno": 227,
+                "source": "def auth_status():\n    if 'user_id' in session:\n        session[\"logged_in\"]=True\n        return jsonify({\n            \"logged_in\": True,\n            \"user\": {\n                \"ID\": session['user_id'],\n                \"Username\": session['username'],\n                \"isAdmin\": session.get('is_admin')\n            }\n        }), 200\n    else:\n        return jsonify({\"logged_in\": False}), 200"
+            },
+            {
+                "name": "google_login",
+                "kind": "function",
+                "lineno": 230,
+                "end_lineno": 232,
+                "source": "def google_login():\n    redirect_uri = url_for(\"google_authorize\", _external=True)\n    return google.authorize_redirect(redirect_uri)"
+            },
+            {
+                "name": "google_authorize",
+                "kind": "function",
+                "lineno": 235,
+                "end_lineno": 258,
+                "source": "def google_authorize():\n    token = google.authorize_access_token()\n    user_info = token[\"userinfo\"]\n\n    \n    googleLogin = auth.googleLogin(\n        user_info[\"sub\"],\n        user_info[\"email\"]\n    )\n    if googleLogin is None:\n        return jsonify({\"error\": \"Google login failed\"}), 401\n    \n    \n    \n    session[\"user\"] = {\n        \"id\": googleLogin.get(\"MongoId\"),\n        \"email\": user_info.get(\"email\"),\n        \"name\": user_info.get(\"name\"),\n        \"picture\": user_info.get(\"picture\"),\n        \"username\": googleLogin.get(\"Username\")\n    }\n    session[\"logged_in\"]=True\n    \n    return redirect(\"https://sd-bu25.pages.dev/auth/Account\")"
+            },
+            {
+                "name": "comments",
+                "kind": "function",
+                "lineno": 262,
+                "end_lineno": 299,
+                "source": "def comments(gameID):\n    # Only changing this function to use single return statement due to confusion with multiple return statements and status codes.\n    # Other functions can be changed later if needed. Priority Low.\n    status={}\n    code=0\n    \n    if request.method == 'POST':\n        if session.get(\"user_id\") is None:\n            status[\"error\"]=\"Authentication required\"\n            code=401\n            return jsonify(status),code \n        \n         \n        commentData = {\n            \"gameID\": gameID,\n            \"userID\": db.to_objId(session.get(\"user_id\")),\n            \"parentCommentID\": db.to_objId(request.json.get(\"parentCommentID\")),\n            \"commentText\": request.json.get(\"commentText\"),\n            \"createdAt\": request.json.get(\"createdAt\")\n        }\n        db.addComment(commentData)\n        status[\"message\"]=\"Comment added successfully\"\n        code=201\n\n    elif request.method == 'GET':  # GET request\n            \n        comments = db.getComments(gameID)\n        if comments is None or len(comments) == 0:\n            status[\"error\"]=\"No comments found\"\n            code=404\n        status={\"comments\":comments}\n        code=200\n    else:\n        status[\"error\"]=\"Invalid request method\"\n        code=405\n    \n    # New method of returning response with status code. Changed due to confusion with multiple return statements.\n    return jsonify(status),code"
+            },
+            {
+                "name": "get_users",
+                "kind": "function",
+                "lineno": 302,
+                "end_lineno": 304,
+                "source": "def get_users():\n    users = db.getAllUsers()\n    return jsonify({\"users\": users}), 200"
+            },
+            {
+                "name": "get_user",
+                "kind": "function",
+                "lineno": 307,
+                "end_lineno": 311,
+                "source": "def get_user(userId):\n    user = db.getUser(userId)\n    if not user:\n        return jsonify({\"error\": \"User not found\"}), 404\n    return jsonify(user), 200"
+            }
+        ]
     }
-]
+    }
+  ]
+}

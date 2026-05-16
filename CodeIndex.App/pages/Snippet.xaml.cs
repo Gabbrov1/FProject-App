@@ -11,7 +11,7 @@ namespace CodeIndex.App
         public string? FilePath { get; set; }
         public object? ChosenSnippet { get; set; }
 
-        private Dictionary<string, string> snippets = new();
+        private List<CodeSnippetClass> snippets = new();
 
         
 
@@ -49,42 +49,38 @@ namespace CodeIndex.App
         TaskScheduler.FromCurrentSynchronizationContext());
     }
 
+        
+
         private async Task InitializeSnippetsAsync()
         {
-            if (FilePath is null or "")
-            {
-                Console.WriteLine("No file path provided.");
-                return;
-            }
+            if (string.IsNullOrEmpty(FilePath)) return;
 
             try
             {
-                pageLoader loader = new pageLoader();
-                FileDetails fileDetails = await loader.loadPageAsync(FilePath);
+                var loader = new pageLoader();
+                FileDetails? fileDetails = await loader.loadPageAsync(FilePath);
 
-                
-                if (fileDetails?.CodeSnippets is not null && fileDetails.CodeSnippets.Count() > 0)
+                snippets = fileDetails?.CodeSnippets ?? new List<CodeSnippetClass>
                 {
-                    snippets = fileDetails.CodeSnippets;
-                }
-                else
-                {
-                    snippets = new Dictionary<string, string>
-                    {
-                        { "N/A", "No snippets found in this file." }
-                    };
-                }
+                    new() { Name = "N/A", Source = "No snippets found.", Kind = "", Lineno = 0, EndLineno = 0 }
+                };
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to load snippets: {ex.Message}");
-                snippets = new Dictionary<string, string>
+                snippets = new List<CodeSnippetClass>
                 {
-                    { "Error", ex.Message }
+                    new() { Name = "Error", Source = ex.Message, Kind = "", Lineno = 0, EndLineno = 0 }
                 };
             }
 
-            SnippetCombo.ItemsSource = snippets.Keys;
+            SnippetCombo.ItemsSource = snippets.Select(s => $"{s.Name} ({s.Kind}, line {s.Lineno})");
+        }
+
+        private void SnippetCombo_SelectionChanged(object sender, System.EventArgs e)
+        {
+            if (SnippetCombo.SelectedIndex < 0 || SnippetCombo.SelectedIndex >= snippets.Count) return;
+            CodeDisplay.Text = snippets[SnippetCombo.SelectedIndex].Source;
         }
         
 
@@ -105,11 +101,5 @@ namespace CodeIndex.App
             }
         }
         
-        private void SnippetCombo_SelectionChanged(object sender,System.EventArgs e)
-        {
-            if (SnippetCombo.SelectedItem is not string key) return;
-            if (snippets.TryGetValue(key, out string? code))
-                CodeDisplay.Text = code;
-        }
     }
 }

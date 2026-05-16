@@ -1,5 +1,5 @@
 ﻿CodeIndex.App
-1.0.0.0
+
 
 exe
 C#
@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_O
 C:\Users\AdminServer\Desktop\FInal_Project_BU_IGS\FProject-App\CodeIndex.App\App.xaml
 525215916
 2-54566871
-12-1465883298
+102119692380
 205578823495
 MainWindow.xaml;pages\home.xaml;pages\Snippet.xaml;pages\UploadPage.xaml;Styles\Styles.xaml;
 
-True
+False
 

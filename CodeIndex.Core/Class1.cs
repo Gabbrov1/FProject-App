@@ -13,21 +13,18 @@
 
     public class CodeSnippetClass
     {
-        public string Name { get; set; }
-        public string Kind { get; set; }
+        public string? Name { get; set; }
+        public string? Kind { get; set; }
         public int Lineno { get; set; }
         public int EndLineno { get; set; }
-        public string Source { get; set; }
+        public string? Source { get; set; }
     }
     public class FileDetails
     {
         public required string Extension { get; set; }
         public string? Language { get; set; }
         public string? CommentSymbol { get; set; }
-
-        public Dictionary<string, string>? CodeSnippets { get; set; }
-
-
+        public List<CodeSnippetClass>? CodeSnippets { get; set; }
     }
 
     public enum Pages

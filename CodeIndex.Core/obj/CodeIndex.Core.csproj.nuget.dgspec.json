@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {}
+    "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {
+    "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj",
+        "projectUniqueName": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj",
         "projectName": "CodeIndex.Core",
-        "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj",
+        "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj",
         "packagesPath": "C:\\Users\\AdminServer\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\obj\\",
+        "outputPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

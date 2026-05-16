@@ -33,11 +33,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.App\\CodeIndex.App.csproj",
+      "projectUniqueName": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.App\\CodeIndex.App.csproj",
       "projectName": "CodeIndex.App",
-      "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.App\\CodeIndex.App.csproj",
+      "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.App\\CodeIndex.App.csproj",
       "packagesPath": "C:\\Users\\AdminServer\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.App\\obj\\",
+      "outputPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.App\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -59,8 +59,8 @@
         "net10.0-windows7.0": {
           "targetAlias": "net10.0-windows",
           "projectReferences": {
-            "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {
-              "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FPRoject-App\\CodeIndex.Core\\CodeIndex.Core.csproj"
+            "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj": {
+              "projectPath": "C:\\Users\\AdminServer\\Desktop\\FInal_Project_BU_IGS\\FProject-App\\CodeIndex.Core\\CodeIndex.Core.csproj"
             }
           }
         }

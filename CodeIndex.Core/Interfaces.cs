@@ -18,7 +18,7 @@ interface IFileProcessor
     /// </summary>
     /// <param name="filePath">The path of the file to process.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a dictionary of snippet names and their corresponding code.</returns>
-    Task<Dictionary<string?, string>> ProcessFileAsync(string filePath);
+    Task<Dictionary<string, string>> ProcessFileAsync(string filePath);
 
     
 }

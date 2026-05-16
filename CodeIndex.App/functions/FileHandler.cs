@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -29,10 +30,20 @@ namespace CodeIndex.App
         }
     }
 
-    public class JsonFile
+    public class JsonFile : INotifyPropertyChanged
     {
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
-        public bool IsSelected { get; set; }
+        public string? FileName { get; set; }
+        public string? FilePath { get; set; }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
